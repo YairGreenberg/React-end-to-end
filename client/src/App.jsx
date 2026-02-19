@@ -1,35 +1,37 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import DataPage from './components/DataPage';
+import TestPage from './components/TestPage';
+import './App.css';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    axios.get('http://localhost:3033/api/data')
+      .then(res => {
+        console.log("Data received from server:", res.data);
+        setData(res.data);
+      })
+      .catch(err => console.error("Could not connect to server:", err));
+  }, []);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <Router>
+      <nav className="navbar">
+        <Link to="/" className="nav-link"> Data Table</Link>
+        <Link to="/test" className="nav-link"> Dynamic Test</Link>
+      </nav>
+
+      <main className="container">
+        <Routes>
+          <Route path="/" element={<DataPage data={data} />} />
+          <Route path="/test" element={<TestPage data={data} />} />
+        </Routes>
+      </main>
+    </Router>
+  );
 }
 
-export default App
+export default App;
